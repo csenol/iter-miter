@@ -1,19 +1,20 @@
 package scalatr
 
+import play.api.libs.iteratee.{Enumerator,Enumeratee,Iteratee}
+
 object Iter2 {
   
+  val r = new java.io.BufferedReader( new java.io.FileReader("/tmp/hede"))
 
-  val l = 1::2::3::4::5::6::Nil
-
-  def acc( lst:List[Int]) = {
-    def helper(consume:List[Int], accu:List[Int]) = {
-      if(accu.size == 3)
-	accu.reduce(_ + ) :: helper(consume, List[Int]())
-      else if (consume.isEmpty)
-	Nil
-      else 
-	helper(consume.tail, consume.head :: accu)
-    }    
+  val e = Enumerator.generateM{
+    val line = r.readLine
+    val chunk = if(line == null) None else Some(line)
+    scala.concurrent.Future.successful(chunk)
   }
 
+  val toInt = Enumeratee.map( (x:String) => x.toInt)
+
+  val sum = Iteratee.fold(0)((x:Int, y:Int) => x + y)
+
+  
 }
