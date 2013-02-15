@@ -3,38 +3,31 @@ package scalatr
 import Mappers._
 import Folders._
 
-object HighOrders extends App {
+object HighOrders {
 
-  val list = 1::2::3::4::5::Nil
+  val listNumbers = 1::2::3::4::5::Nil
+  val listStrings = List("1", "2", "3", "4", "5")
+
+  def add1(x: Int) = x + 1
+  def mul2(x: Int) = x * 2
+  def toInt(x: String) = x.toInt
+
+  def sum(a:Int, b:Int) = a + b
+
+  val result1 = listStrings.map(toInt).fold(0)(sum)
+  println(result1 == 15)
+
+  val result2 = listStrings.map((x: String) =>x.toInt).fold(0)((x:Int, y:Int) => x + y)
+  println(result2 == 15)
+
+  val result3 = listStrings.map(_.toInt).fold(0)( _ + _)
+  println(result3 == 15)
+
+  //dosyadaki sayilari toplama
+  val file = scala.io.Source.fromFile("/tmp/hede")
+  val fileResult = file.getLines().map(_.toInt).fold(0)(_ + _)
+  file.close()
+
   
-  //kotu cunku syntax kotu duruyor
-  // ayrica add1 ve mul2 yapacagimiz her liste icin uzun uzun yazmamiz lazim
-  val mapped = mapper(add1)(mapper(mul2)(list))
-  println(mapped)
-
-  val mappedComposed = mapper(add1)_ compose mapper(mul2)_
-
-  println(mappedComposed(list))
   
-  //function composition f(g(x))
-  val addMul = add1 compose mul2
-
-  //herhangi bir listeyi tek seferde once 2 ile carpip sonra 1 ekleyen fosnkiyon
-  val mapAddMul = mapper(addMul) _
-  
-  println(mapAddMul(list))
-
-  //herhangi bir listeyi concat edebilecek fonksiyon
-  val concaterFolder = folder(".")(concat)_
-
-  val concated = concaterFolder(mapAddMul(list))
-
-  println(concated)
-
-  //Bu sekilde dosyalardan ya da herhangi bir yerden bir veriyi okuyup
-  // memory e liste seklinde alip
-  //isleyebiliriz
-
-  //Ancak hem memory harciyoruz hem de blocking isler yapiyoruz
-
 }

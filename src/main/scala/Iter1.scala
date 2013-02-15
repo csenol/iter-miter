@@ -9,7 +9,6 @@ object Iter1 {
   // ve map ve fold isleri non-blocking yapabiliyoruz
   val l = Enumerator(1,2,3,4,5)
 
-
   val add1 = Enumeratee.map( (x:Int) => x + 1)
   val mul2 =  Enumeratee.map( (x:Int) => x * 2)
 
@@ -32,7 +31,6 @@ object Iter1 {
   //en son listeyi tuketiyoruz
   //f artik bir future deger
   val f = l |>>> consume 
-
 
   val f2 =  l |>>> add1 ><> mul2 &>> sum
     

@@ -1,7 +1,7 @@
 scalaVersion := "2.10.0"
 
 libraryDependencies ++= Seq(
-"play" % "play-iteratees_2.10" % "2.1-RC3"
+"play" % "play-iteratees_2.10" % "2.1.0"
    )
 
 resolvers ++= Seq(

@@ -4,9 +4,9 @@ object Folders {
 
   val list = 1::2::3::4::5::Nil
 
-  val sum = (a:Int, b:Int) => a + b
-  val mul = (a:Int, b:Int) =>  a * b
-  val concat= (a:Int, b:String) => a.toString + b
+  def sum (a:Int, b:Int) = a + b
+  def mul (a:Int, b:Int) =  a * b
+  def concat (a:Int, b:String) = a.toString + b
 
   def listSum(lon:List[Int]): Int = {
     lon match {
