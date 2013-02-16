@@ -27,7 +27,4 @@ object HighOrders {
   val file = scala.io.Source.fromFile("/tmp/hede")
   val fileResult = file.getLines().map(_.toInt).fold(0)(_ + _)
   file.close()
-
-  
-  
 }

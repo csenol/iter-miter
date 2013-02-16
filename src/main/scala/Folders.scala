@@ -46,6 +46,4 @@ object Folders {
       case Nil => z // Pattern 1
       case x::xs => f(x , folder(z)(f)(xs)) //Pattern 2
     }
-
-
 }

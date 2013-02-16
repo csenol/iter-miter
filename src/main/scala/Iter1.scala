@@ -22,7 +22,6 @@ object Iter1 {
   //alias
   val addMul2 = add1 ><> mul2
 
-
   //map ediyoruz ve ardindan fold luyoruz
   
   //apply alias i da &>> 
