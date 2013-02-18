@@ -1,0 +1,285 @@
+#+TITLE:     Scala ve Veri Akışları
+#+AUTHOR:    Çağdaş Şenol
+#+DESCRIPTION: 
+#+KEYWORDS: 
+#+LANGUAGE:  en
+#+OPTIONS:   H:3 num:t toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+OPTIONS:   TeX:t LaTeX:nil skip:nil d:nil todo:t pri:nil tags:not-in-toc
+#+INFOJS_OPT: view:nil toc:nil ltoc:t mouse:underline buttons:0 path:http://orgmode.org/org-info.js
+#+EXPORT_SELECT_TAGS: export
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+LINK_UP:   
+#+LINK_HOME: 
+#+startup: beamer
+#+LaTeX_CLASS: beamer
+#+LaTeX_CLASS_OPTIONS: [bigger]
+
+
+
+* Listeler ve Methodlar
+
+#+begin_src scala
+
+  val numberList = 1::2::3::4::5::Nil
+
+  val stringList = "1"::"2"::"3"::"4"::Nil
+ 
+  def add1(x: Int) = x + 1
+  def mul2(x: Int) = x * 2
+  def toInt(x: String) = x.toInt
+
+#+end_src
+
+* Basit Liste İşlemleri - Değiştirme
+
+#+begin_src scala
+
+  def add1ToAll(lon: List[Int]): List[Int] = 
+    if(lon.isEmpty)
+      Nil
+    else
+      add1(lon.head) :: add1ToAll(lon.tail) 
+
+#+end_src 
+
+
+* Desen Eşleme ve Tekrar Eden Desenler
+
+- Pattern Matching İle daha şık yazmak mümkün
+
+#+begin_src scala
+
+  def mul2WithAll(lon: List[Int]): List[Int] = 
+    lon match {
+      case Nil => Nil //Pattern 1
+      case x::xs => mul2(x) :: mul2WithAll(xs) //Pattern 2
+    }
+
+  def toIntAll(lon: List[String]): List[Int] = 
+    lon match {
+      case Nil => Nil //Pattern 1
+      case x::xs => toInt(x) :: toIntAll(xs) //Pattern 2
+    }
+    
+#+end_src 
+
+
+* Soyutlama 1
+
+- Yapılan İşlem Aynı.
+- Bir Liste al ve bir fonksiyon uygulanmış halini döndür
+
+#+begin_src scala
+
+  def mapper[A,B](f: A => B)(loa:List[A]): List[B] = 
+    loa match {
+      case Nil => Nil //Pattern 1
+      case x::xs => f(x) :: mapper(f)(xs) //Pattern 2
+    }
+
+#+end_src
+- Ödev: Filter yazın
+
+* Basit Liste İşlemleri - Tüketme
+
+#+begin_src scala
+  val list = 1::2::3::4::5::Nil
+
+  def sum (a:Int, b:Int) = a + b
+  def mul (a:Int, b:Int) =  a * b
+  def concat (a:Int, b:String) = a.toString + b
+
+#+end_src
+
+
+* Basit Liste İşlemleri - Tüketme
+
+#+begin_src scala
+
+  def listSum(lon:List[Int]): Int = {
+    lon match {
+      case Nil => 0 // Pattern 1
+      case x::xs => sum(x , listSum(xs)) //Pattern 2
+    }
+  }
+  
+  def listMul(lon:List[Int]): Int = 
+    lon match {
+      case Nil => 1 // Pattern 1
+      case x::xs => mul(x , listMul(xs)) //Pattern 2
+    }
+  
+#+end_src
+
+* Yine Benzer Desen
+#+begin_src scala
+  def listConcat(lon:List[Int]): String = 
+    lon match {
+      case Nil => "" // Pattern 1
+      case x::xs => concat(x, listConcat(xs)) //Pattern 2
+    }  
+#+end_src
+
+
+* Soyutlama
+ - Sadece Int tipi ile oldu
+#+begin_src scala
+
+  def fold1(z:Int)(f: (Int,Int) => Int)(lon:List[Int]) : Int = 
+    lon match {
+      case Nil => z 
+      case x::xs => f(x , fold1(z)(f)(xs)) 
+    }
+  
+
+#+end_src
+
+* Soyutlama
+
+- Sadece Ayni tipler üzerinde çalışır halde oldu. 
+
+#+begin_src scala
+  def fold2[A](z:A)(f: (A,A) => A)(lon:List[A]) : A = 
+    lon match {
+      case Nil => z // Pattern 1
+      case x::xs => f(x , fold2(z)(f)(xs)) //Pattern 2
+    }  
+#+end_src
+
+* Soyutlama
+ -En genel Halde Liste tüketme işi
+#+begin_src scala
+   def folder[A,B](z:B)(f: (A,B) => B)(loa:List[A]) : B = 
+    loa match {
+      case Nil => z // Pattern 1
+      case x::xs => f(x , folder(z)(f)(xs)) //Pattern 2
+    }
+#+end_src
+ - Ödev: Foreach yazın
+
+* Kullanalım Bunları
+
+#+begin_src scala
+  val listNumbers = 1::2::3::4::5::Nil
+  val listStrings = List("1", "2", "3", "4", "5")
+
+  def add1(x: Int) = x + 1
+  def mul2(x: Int) = x * 2
+  def toInt(x: String) = x.toInt
+  def sum(a:Int, b:Int) = a + b
+#+end_src
+
+* Kullanım 1  
+#+begin_src scala
+  val result1 = listStrings.map(toInt).fold(0)(sum)
+  println(result1 == 15)
+#+end_src
+
+* Kullanım 2
+ - Anonim fonksiyonlar 
+#+begin_src scala
+  val result2 = listStrings
+                 .map((x: String) =>x.toInt)
+                 .fold(0)((x:Int, y:Int) => x + y)
+  println(result2 == 15)
+#+end_src
+
+* Kullanım 3
+ - Underscore
+#+begin_src scala
+  val result3 = listStrings.map(_.toInt).fold(0)( _ + _)
+  println(result3 == 15)
+#+end_src
+
+* Gerçek Hayatta Ne İşimize Yarayacak
+#+begin_src scala
+  //dosyadaki sayilari toplama
+  val file = scala.io.Source.fromFile("/tmp/hede")
+  val fileResult = file.getLines()
+                      .map(_.toInt)
+                      .fold(0)(_ + _)
+  file.close()
+#+end_src
+  
+
+* Enumerator
+
+ - Ya dosya çok büyükse ya da I/O bizi çok bekletiyorsa
+ - Simdilik Enumerator u liste ile ayni varsayalim
+#+begin_src scala
+  val l = Enumerator(1,2,3,4,5)
+#+end_src
+
+* Enumeratee / Mapper
+ - Listeler icin map yazar gibi.
+ - Tek farkli liste.map diye cagirmak yerine
+ - Map Fonksiyounu Liste alacak şekilde önceden hazırlıyoruz.
+ - Gibi düşünelim
+
+#+begin_src scala
+  val add1 = Enumeratee.map( (x:Int) => x + 1)
+  val mul2 =  Enumeratee.map( (x:Int) => x * 2)
+#+end_src
+
+* Iteratee 
+ - Folder imiz gibi Listeyi tükettebilirz de
+ - Bunun için Iteratee ler var
+#+begin_src scala
+  val sum = Iteratee.fold(0)( (x:Int, y:Int) =>  x + y)
+  val printer = Iteratee.foreach(println _)
+#+end_src
+ - Tüketmek üzere liste bekliyor
+
+* Enumeratorler ve Composition
+- Enumeratorler composoble.
+- yani l.map(_ + 1).map(_ * 3) yazmak gibi
+#+begin_src scala
+  val addMul = add1.compose(mul2)
+  val addMul2 = add1 ><> mul2
+#+end_src
+ - Meşhur fish operator
+
+* Değiştir ve Tüket
+#+begin_src scala
+  val consume = addMul2 &>> sum
+  val f = l |>>> consume 
+  val f2 =  l |>>> add1 ><> mul2 &>> sum
+#+end_src
+
+ - f ve f2 nin tipleri Future.
+ - |>>> Asenkron bir çağrı
+ - ExecutionContex ile non-blocking
+
+
+* Gerçek Hayatta Ne İşimize Yarayacak
+#+begin_src scala
+  def ene(path:String) = {
+    val r = new java.io.BufferedReader(
+             new java.io.FileReader(path)) 
+    Enumerator.fromCallback1( b => {
+      val line = r.readLine
+      val chunk = if(line == null) None else Some(line)
+      scala.concurrent.Future.successful(chunk)
+    }, r.close			     )
+  }
+#+end_src
+
+* Gerçek Hayatta Ne İşimize Yarayacak
+#+begin_src scala
+  val res = e |>>> toInt &>> sum  
+  res.onFailure{ case t => println(t.getCause)
+  res.onSuccess{ case t => println(t)}
+#+end_src
+
+* Toparlarken
+ - Map, Filter, Fold ve Foreach ile neredeyse her türlü
+ - Liste ve Stream İşlemini yapabilirsiniz.
+ - Play Iteratee Kütüphanesi standalone halde play bağımsız
+ - Listeler Nasıl Head ve Tail den oluşuyorsa
+ - Streamler de Cont, Done ve Empty Tipinden oluşuyor
+
+* Son
+ - Teşekkürler.
+ - Sorular.
+ - Scala-Türkiye Google groups
+ - scala-turkiye github
