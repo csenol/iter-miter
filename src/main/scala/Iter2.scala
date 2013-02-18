@@ -6,7 +6,7 @@ import ExecutionContext.Implicits.global
 
 object Iter2{
   
-  def ene(path:String) = {
+  def enumFromFile(path:String) = {
     val r = new java.io.BufferedReader( new java.io.FileReader(path))
     
     Enumerator.fromCallback1( b => {
@@ -16,7 +16,7 @@ object Iter2{
     }, r.close			     )
   }
 
-  val inter = Enumeratee.map( (x:String) => x.toInt)
+  val intMapper = Enumeratee.map( (x:String) => x.toInt)
 
   val sum = Iteratee.fold(0)((x:Int, y:Int) => x + y)
 
