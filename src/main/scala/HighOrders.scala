@@ -2,7 +2,7 @@ package scalatr
 
 import Mappers._
 import Folders._
-as;as;sa,
+as;as;sa,sda
 object HighOrders {
 
   val listNumbers = 1::2::3::4::5::Nil
